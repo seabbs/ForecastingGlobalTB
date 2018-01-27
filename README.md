@@ -1,0 +1,16 @@
+
+Forecasting future global Tuberculosis incidence
+================================================
+
+This repository explores various methods to forecast future Tuberculosis incidence rates. It uses data from the [WHO](http://www.who.int/tb/country/data/download/en/), using the [getTBinR](https://github.com/seabbs/getTBinR) package.
+
+### Docker
+
+This analysis was developed in a docker container based on the [tidyverse](https://hub.docker.com/r/rocker/tidyverse/) docker image. To run the docker image run:
+
+``` bash
+docker pull seabbs/forecastingglobaltb
+docker run -d -p 8787:8787 -p 54321:54321 -e USER=ForecastingGlobalTB -e PASSWORD=ForecastingGlobalTB --name ForecastingGlobalTB seabbs/forecastingglobaltb
+```
+
+The rstudio client can be found on port `:8787` at your local machines ip. The default username:password is seabbs:seabbs, set the user with `-e USER=username`, and the password with `- e PASSWORD=newpasswordhere`. For me details see the `rocker/tidyverse` docker image.
