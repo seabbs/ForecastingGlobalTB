@@ -1,0 +1,76 @@
+---
+title: "Predicting Tuberculosis Incidence with H2o"
+output: html_notebook
+---
+
+
+```{r packages}
+library(tidyverse)
+library(h2o)
+library(getTBinR)
+```
+
+- Aim: Predict year ahead Tuberculosis incidence using h2o
+- Explain data, getTBinR
+- Visualise Global TB incidence
+- Set up data, previous 
+- Baseline model; univariable regression model
+- Background gbm
+- GBM model
+- Add features aggregate incidence, regional incidence etc
+- Add 3 year moving averages
+
+
+```{r get-data}
+tb_df <- get_tb_burden() %>% 
+  mutate(g_whoregion = ifelse(is.na(g_whoregion), "Asia", g_whoregion))
+dict <- get_data_dict()
+
+## Data structure
+glimpse(tb_df)
+```
+
+```{r checkout-incidence}
+search_data_dict(var = "e_inc_num", dict = dict)
+```
+
+
+```{r global-inc}
+total_inc <- tb_df %>%
+  group_by(year) %>% 
+  summarise(e_inc_num = sum(e_inc_num, na.rm = T))
+
+
+total_inc %>% 
+  ggplot(aes(x = year, y = e_inc_num)) + 
+  geom_point() + 
+  geom_line() + 
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r regional-inc}
+regional_inc <- tb_df %>%
+  group_by(year, g_whoregion) %>% 
+  summarise(e_inc_num = sum(e_inc_num, na.rm = T))
+
+
+regional_inc %>% 
+  ggplot(aes(x = year, y = e_inc_num, col = g_whoregion)) + 
+  geom_point() + 
+  geom_line() + 
+  facet_wrap(~g_whoregion) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+
+```{r data-for-modelling}
+target_df <- tb_df %>% 
+  select(country, g_whoregion, e_inc_num
+)
+prev_yr_df <- tb_df %>% 
+  select(-country, -g_whoregion, -iso3, -iso_numeric) %>% 
+  mutate(year = year + 1) %>% 
+  rename_all(.funs = funs(paste0("prev_year_", .)))
+````
